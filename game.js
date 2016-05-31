@@ -68,15 +68,27 @@ var reset = function() {
 var update = function (modifier) {
     if (38 in keysDown) { // 用户按的是↑
         hero.y -= hero.speed * modifier;
+        if (hero.y < 32) {
+        	hero.y = 32;
+        }
     }
     if (40 in keysDown) { // 用户按的是↓
         hero.y += hero.speed * modifier;
+        if (hero.y < 32) {
+        	hero.y = 32;
+        }
     }
     if (37 in keysDown) { // 用户按的是←
         hero.x -= hero.speed * modifier;
+		if (hero.x < 32) {
+        	hero.x = 32;
+        }        
     }
     if (39 in keysDown) { // 用户按的是→
         hero.x += hero.speed * modifier;
+        if (hero.x < 32) {
+        	hero.x = 32;
+        }
     }
 
     // 英雄与怪物碰到了么？
