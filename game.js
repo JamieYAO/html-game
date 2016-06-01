@@ -37,10 +37,7 @@ var hero = {
 	y: 0
 };
 
-var monster = {
-	x: 0,
-	y: 0
-};
+var monster = {}
 var monstersCaught = 0;
 
 //handle key
@@ -54,45 +51,62 @@ addEventListener('keyup', function(e){
 	delete keysDown[e.keyCode];
 }, false);
 
-
+var monsterNo = Math.random() * 10;
 // init game hero and monster
 var reset = function() {
 	hero.x = canvas.width / 2;
 	hero.y = canvas.height / 2;
 
-	monster.x = 32 + (Math.random() * (canvas.width - 64));
-	monster.y = 32 + (Math.random() * (canvas.height - 64));
+
+	for (var k=0; k < monsterNo; k ++) {
+		monster[k] = {};	
+		monster[k].x = 32 + (Math.random() * (canvas.width - 64));
+		monster[k].y = 32 + (Math.random() * (canvas.height - 64));
+	}
 }
 
 // refresh hero and monster and checkout two
 var update = function (modifier) {
-    if (38 in keysDown) { // 用户按的是↑
+	var heroOldy = hero.y, heroOldx = hero.x;
+    if (38 in keysDown) { // keyboard ↑
+    	heroOldy = hero.y;
         hero.y -= hero.speed * modifier;
         if (hero.y < 32) {
         	hero.y = 32;
         }
+        collisionDetecionXY(heroOldx, heroOldy)
     }
-    if (40 in keysDown) { // 用户按的是↓
+    if (40 in keysDown) { // keyboard ↓
+    	heroOldy = hero.y;
         hero.y += hero.speed * modifier;
-        if (hero.y < 32) {
-        	hero.y = 32;
+        if (hero.y > canvas.height - 64) {
+        	hero.y = canvas.height - 64;
         }
+        collisionDetecionXY(heroOldx, heroOldy)
     }
-    if (37 in keysDown) { // 用户按的是←
+    if (37 in keysDown) { // keyboard ←
+    	heroOldx = hero.x;
         hero.x -= hero.speed * modifier;
 		if (hero.x < 32) {
         	hero.x = 32;
-        }        
-    }
-    if (39 in keysDown) { // 用户按的是→
-        hero.x += hero.speed * modifier;
-        if (hero.x < 32) {
-        	hero.x = 32;
         }
+        collisionDetecionXY(heroOldx, heroOldy)        
+    }
+    if (39 in keysDown) { // keyboard →
+    	heroOldx = hero.x;
+        hero.x += hero.speed * modifier;
+        if (hero.x > canvas.width - 64) {
+        	hero.x = canvas.width - 64;
+        }
+        collisionDetecionXY(heroOldx, heroOldy)
     }
 
     // 英雄与怪物碰到了么？
-    if (
+    //collisionDetecion();
+};
+
+function collisionDetecion(herox, heroy) {
+	if (
         hero.x <= (monster.x + 32)
         && monster.x <= (hero.x + 32)
         && hero.y <= (monster.y + 32)
@@ -101,8 +115,19 @@ var update = function (modifier) {
         ++monstersCaught;
         reset();
     }
-};
+}
 
+function collisionDetecionXY(heroOldx, heroOldy) {
+	for (var k = 0; k < monsterNo; k++) {
+		if (hero.x <= (monster[k].x + 32) 
+			&& monster[k].x <= (hero.x + 32) 
+			&& hero.y <= (monster[k].y + 32) 
+			&& monster[k].y <= (hero.y + 32)) {
+				hero.x = heroOldx;
+				hero.y = heroOldy;
+		}
+	}
+}
 
 // render all
 var render = function() {
@@ -115,7 +140,9 @@ var render = function() {
 	}
 
 	if (monsterReady) {
-		ctx.drawImage(monsterImage, monster.x, monster.y);
+		for (var k = 0; k < monsterNo; k++) {
+			ctx.drawImage(monsterImage, monster[k].x, monster[k].y);
+		}
 	}
 
 	// 计分
